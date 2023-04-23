@@ -2,18 +2,18 @@
 
 namespace transport {
 
-    void TransportCatalogue::AddBus(Bus& bus) {
-        AllBuses.push_back(bus);
-        for (const auto& stop : bus.NameStops) {
-            if (StopNameToStop.count(stop)) {
-                StopNameToStop.at(stop)->NameBuses.insert(bus.NameBus);
+    void TransportCatalogue::AddBus(const std::string& name, const std::vector<Stop*>& stops, bool is_circle) {
+        AllBuses.push_back(Bus(name, stops, is_circle));
+        for (const auto& stop : stops) {
+            if (StopNameToStop.count(stop->NameStop)) {
+                StopNameToStop.at(stop->NameStop)->NameBuses.insert(&AllBuses.back());
             }
         }
         BusNameToBus[AllBuses.back().NameBus] = &AllBuses.back();
     }
 
-    void TransportCatalogue::AddStop(Stop& stop) {
-        AllStops.push_back(stop);
+    void TransportCatalogue::AddStop(const std::string& name, const geo::Coordinates& coordinates) {
+        AllStops.push_back(Stop(name, coordinates));
         StopNameToStop[AllStops.back().NameStop] = &AllStops.back();
     }
 
@@ -29,59 +29,60 @@ namespace transport {
         return StopNameToStop.count(name) ? StopNameToStop.at(name) : nullptr;
     }
 
-    const std::set<std::string> TransportCatalogue::GetStopRoutes(std::string_view name) const {
+    const std::set<Bus*, Bus::cmp_ptr> TransportCatalogue::GetStopRoutes(std::string_view name) const {
         return StopNameToStop.at(name)->NameBuses;
     }
 
     void TransportCatalogue::SetDistanceBetweenStops(Stop* from, Stop* to, int distance) {
-        from->Distance[to->NameStop] = distance;
+        from->Distance[to] = distance;
     }
 
-    int TransportCatalogue::GetDistanceBetweenStops(const Stop* from, const Stop* to) const {
-        if (from->Distance.count(to->NameStop)) return from->Distance.at(to->NameStop);
-        else if (to->Distance.count(from->NameStop)) return to->Distance.at(from->NameStop);
+    int TransportCatalogue::GetDistanceBetweenStops(Stop* from, Stop* to) const {
+        if (from->Distance.count(to)) return from->Distance.at(to);
+        else if (to->Distance.count(from)) return to->Distance.at(from);
         else return 0;
     }
 
 
-    const RouteInformation TransportCatalogue::GetRouteInformation(const std::string& name) const {
+    const RouteInformation TransportCatalogue::GetRouteInformation(std::string_view name) const {
         RouteInformation result;
 
         const Bus* bus = SearchRoute(name);
-        
+
         if (!bus) throw std::invalid_argument("bus not found");
 
         bus->CircularRoute ?
-            result.StopCount = bus->NameStops.size() :
-            result.StopCount = bus->NameStops.size() * 2 - 1;
+            result.StopCount = bus->Stops.size() :
+            result.StopCount = bus->Stops.size() * 2 - 1;
 
         int route_length = 0;
         double geographic_length = 0.0;
 
-        for (auto it = bus->NameStops.begin(); it + 1 != bus->NameStops.end(); ++it) {
-            auto from = StopNameToStop.find(*it)->second;
-            auto to = StopNameToStop.find((*(it + 1)))->second;
+        for (auto it = bus->Stops.begin(); it + 1 != bus->Stops.end(); ++it) {
+
+            const auto from = (*it);
+            const auto to = *(it + 1);
 
             if (bus->CircularRoute) {
                 route_length += GetDistanceBetweenStops(from, to);
-                geographic_length += geo::ComputeDistance(StopNameToStop.find(*it)->second->Coordinates,
-                    StopNameToStop.find(*(it + 1))->second->Coordinates);
+                geographic_length += geo::ComputeDistance((*it)->Coordinates,
+                    (*(it + 1))->Coordinates);
             }
             else {
                 route_length += GetDistanceBetweenStops(from, to) + GetDistanceBetweenStops(to, from);
-                geographic_length += geo::ComputeDistance(StopNameToStop.find(*it)->second->Coordinates,
-                    StopNameToStop.find(*(it + 1))->second->Coordinates) * 2;
+                geographic_length += geo::ComputeDistance((*it)->Coordinates,
+                    (*(it + 1))->Coordinates) * 2;
             }
         }
 
         if (bus->CircularRoute) {
-            auto from = StopNameToStop.find(*(bus->NameStops.end() - 1))->second;
-            auto to = StopNameToStop.find(*(bus->NameStops.begin()))->second;
+            auto from = *(bus->Stops.end() - 1);
+            auto to = (*(bus->Stops.begin()));
             route_length += GetDistanceBetweenStops(from, to);
             geographic_length += geo::ComputeDistance(from->Coordinates, to->Coordinates);
         }
 
-        std::unordered_set<std::string> unique_stops{ bus->NameStops.begin(),bus->NameStops.end() };
+        std::unordered_set<Stop*> unique_stops{ bus->Stops.begin(),bus->Stops.end() };
 
         result.NameRoute = bus->NameBus;
         result.UniqueStopCount = unique_stops.size();

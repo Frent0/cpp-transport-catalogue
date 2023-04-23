@@ -14,18 +14,41 @@
 
 namespace transport {
 
+	struct Stop;
+
+	struct Bus {
+		Bus(const std::string& name, const std::vector<Stop*>& stops, bool is_circle) :
+			NameBus(name), Stops(stops), CircularRoute(is_circle) {
+
+		}
+
+		std::string NameBus;
+		std::vector<Stop*> Stops;
+		bool CircularRoute;
+
+		struct cmp_ptr
+		{
+			bool operator()(const Bus* lhs, const Bus* rhs) const
+			{
+				return lhs->NameBus < rhs->NameBus;
+			}
+		};
+	};
+
+
 	struct Stop {
+
+		Stop(const std::string& name, const geo::Coordinates& coordinates) :
+			NameStop(name), Coordinates(coordinates) {
+
+		}
+
 		std::string NameStop;
-		std::set<std::string> NameBuses;
-		std::unordered_map<std::string, int> Distance;
+		std::set < Bus*, Bus::cmp_ptr> NameBuses;
+		std::unordered_map<Stop*, int> Distance;
 		geo::Coordinates Coordinates;
 	};
 
-	struct Bus {
-		std::string NameBus;
-		std::vector<std::string> NameStops;
-		bool CircularRoute;
-	};
 
 	struct RouteInformation {
 		std::string NameRoute;
@@ -37,24 +60,25 @@ namespace transport {
 
 	class TransportCatalogue {
 	public:
-		
-		void AddBus(Bus& bus);
-		void AddStop(Stop& inpute_data);
 
-		const Bus* SearchRoute(const std::string_view name) const;
-		const Stop* SearchStop(const std::string_view name) const;
-		Stop* SearchStopSetDistance(const std::string_view name) const;
+		void AddBus(const std::string& num, const std::vector<Stop*>& stops, bool is_circle);
+		void AddStop(const std::string& name, const geo::Coordinates& coordinates);
 
-		const RouteInformation GetRouteInformation(const std::string& name) const;
+		const Bus* SearchRoute(std::string_view name) const;
+		const Stop* SearchStop(std::string_view name) const;
 
-		const std::set<std::string> GetStopRoutes(std::string_view name) const;
+		Stop* SearchStopSetDistance(std::string_view name) const;
 
-		void SetDistanceBetweenStops( Stop* from, Stop* to, int distance);
-		int GetDistanceBetweenStops(const Stop* from, const Stop* to) const;
+		const RouteInformation GetRouteInformation(std::string_view name) const;
+
+		const std::set<Bus*, Bus::cmp_ptr> GetStopRoutes(std::string_view name) const;
+
+		void SetDistanceBetweenStops(Stop* from, Stop* to, int distance);
+		int GetDistanceBetweenStops(Stop* from, Stop* to) const;
 
 	private:
 
-		std::unordered_map<std::string_view, const Bus*> BusNameToBus;
+		std::unordered_map<std::string_view, Bus*> BusNameToBus;
 		std::unordered_map<std::string_view, Stop*> StopNameToStop;
 
 		std::deque<Stop> AllStops;

@@ -1,5 +1,6 @@
 #include "stat_reader.h"
 
+#include <algorithm>
 #include <iomanip>
 
 namespace transport {
@@ -26,7 +27,6 @@ namespace transport {
 
             if (catalogue.SearchRoute(route_number)) {
                 RouteInformation bus = catalogue.GetRouteInformation(route_number);
-
                 std::cout << "Bus " << bus.NameRoute
                     << ": " << bus.StopCount << " stops on route, "
                     << bus.UniqueStopCount << " unique stops, " << std::setprecision(6)
@@ -44,11 +44,11 @@ namespace transport {
             std::string stop_name = line.substr(1, line.npos);
             if (catalogue.SearchStop(stop_name)) {
                 std::cout << "Stop " << stop_name << ": ";
-                std::set<std::string> buses = catalogue.GetStopRoutes(stop_name);
+                std::set<Bus*, Bus::cmp_ptr> buses = catalogue.GetStopRoutes(stop_name);
                 if (!buses.empty()) {
                     std::cout << "buses ";
                     for (const auto& bus : buses) {
-                        std::cout << bus << " ";
+                        std::cout << bus->NameBus << " ";
                     }
                     std::cout << std::endl;
                 }
