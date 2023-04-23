@@ -29,7 +29,7 @@ namespace transport {
 
 		for (std::string& stop : stops) {
 			Stop stop_result = information::FillStop(stop);
-			catalogue.AddStop(std::move(stop_result));
+			catalogue.AddStop(stop_result);
 		}
 
 		for (std::string& distance : distance) {
@@ -38,7 +38,7 @@ namespace transport {
 
 		for (std::string& bus : buses) {
 			Bus bus_result = information::FillBus(bus);
-			catalogue.AddBus(std::move(bus_result));
+			catalogue.AddBus(bus_result);
 		}
 
 	}
@@ -93,8 +93,8 @@ namespace transport {
 		void FillStopDistances(std::string& line, TransportCatalogue& catalogue) {
 			if (!line.empty()) {
 
-				std::string stop_from_name = FillStop(line).Name_Stop;
-				Stop* from = catalogue.SearchStop(stop_from_name);
+				std::string stop_from_name = FillStop(line).NameStop;
+				Stop* from = catalogue.SearchStopSetDistance(stop_from_name);
 
 				while (!line.empty()) {
 					int distance = 0;
@@ -106,24 +106,24 @@ namespace transport {
 					if (line.find("m to ") == line.npos) {
 
 						stop_to_name = line.substr(0, line.npos - 1);
-						Stop* to = catalogue.SearchStop(stop_to_name);
+						Stop* to = catalogue.SearchStopSetDistance(stop_to_name);
 
-						catalogue.SettingDistanceBetweenStops(from, to, distance);
+						catalogue.SetDistanceBetweenStops(from, to, distance);
 
-						if (!catalogue.SearchStop(to->Name_Stop)->distance.count(from->Name_Stop)) {
-							catalogue.SettingDistanceBetweenStops(to, from, distance);
+						if (!catalogue.SearchStop(to->NameStop)->Distance.count(from->NameStop)) {
+							catalogue.SetDistanceBetweenStops(to, from, distance);
 						}
 
 						line.clear();
 					}
 					else {
 						stop_to_name = line.substr(0, line.find_first_of(','));
-						Stop* to = catalogue.SearchStop(stop_to_name);
+						Stop* to = catalogue.SearchStopSetDistance(stop_to_name);
 
-						catalogue.SettingDistanceBetweenStops(from, to, distance);
+						catalogue.SetDistanceBetweenStops(from, to, distance);
 
-						if (!catalogue.SearchStop(to->Name_Stop)->distance.count(from->Name_Stop)) {
-							catalogue.SettingDistanceBetweenStops(to, from, distance);
+						if (!catalogue.SearchStop(to->NameStop)->Distance.count(from->NameStop)) {
+							catalogue.SetDistanceBetweenStops(to, from, distance);
 						}
 
 						line.erase(0, line.find_first_of(',') + 2);

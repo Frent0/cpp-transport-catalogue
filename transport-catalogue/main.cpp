@@ -4,5 +4,5 @@
 int main() {
     transport::TransportCatalogue catalogue;
     FillIinTheDatabase(catalogue);
-    GettingInformation(catalogue);
+    GetInformation(catalogue);
 }

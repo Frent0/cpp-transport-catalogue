@@ -6,12 +6,12 @@
 
 namespace transport {
 
-	void GettingInformation(TransportCatalogue& catalogue);
+	void GetInformation(const TransportCatalogue& catalogue);
 
 	namespace information {
 
-		void PrintRoute(std::string& line, TransportCatalogue& catalogue);
-		void PrintStop(std::string& line, TransportCatalogue& catalogue);
+		void PrintRoute(std::string& line, const TransportCatalogue& catalogue);
+		void PrintStop(std::string& line, const TransportCatalogue& catalogue);
 
 	}
 }

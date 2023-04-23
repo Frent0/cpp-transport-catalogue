@@ -15,15 +15,15 @@
 namespace transport {
 
 	struct Stop {
-		std::string Name_Stop;
-		std::set<std::string> Name_Buses;
-		std::unordered_map<std::string, int> distance;
-		geo::Coordinates coordinates;
+		std::string NameStop;
+		std::set<std::string> NameBuses;
+		std::unordered_map<std::string, int> Distance;
+		geo::Coordinates Coordinates;
 	};
 
 	struct Bus {
-		std::string Name_Bus;
-		std::vector<std::string> Name_Stops;
+		std::string NameBus;
+		std::vector<std::string> NameStops;
 		bool CircularRoute;
 	};
 
@@ -37,27 +37,30 @@ namespace transport {
 
 	class TransportCatalogue {
 	public:
+		
+		void AddBus(Bus& bus);
+		void AddStop(Stop& inpute_data);
 
-		void AddBus(Bus&& bus);
-		void AddStop(Stop&& inpute_data);
+		const Bus* SearchRoute(const std::string_view name) const;
+		const Stop* SearchStop(const std::string_view name) const;
+		Stop* SearchStopSetDistance(const std::string_view name) const;
 
-		const Bus* SearchRoute(const std::string& name) const;
-		Stop* SearchStop(const std::string& name) const;
+		const RouteInformation GetRouteInformation(const std::string& name) const;
 
-		const RouteInformation GettingRouteInformation(const std::string& name) const;
+		const std::set<std::string> GetStopRoutes(std::string_view name) const;
 
-		const std::set<std::string> GettingStopRoutes(std::string name) const;
-
-		void SettingDistanceBetweenStops(Stop* from, Stop* to, int distance);
-		int GettingDistanceBetweenStops(Stop* from, Stop* to) const;
+		void SetDistanceBetweenStops( Stop* from, Stop* to, int distance);
+		int GetDistanceBetweenStops(const Stop* from, const Stop* to) const;
 
 	private:
 
-		std::unordered_map<std::string_view, const Bus*> BusName_To_Bus;
-		std::unordered_map<std::string_view, Stop*> StopName_To_Stop;
+		std::unordered_map<std::string_view, const Bus*> BusNameToBus;
+		std::unordered_map<std::string_view, Stop*> StopNameToStop;
 
-		std::deque<Stop> all_stops;
-		std::deque<Bus> all_bus;
+		std::deque<Stop> AllStops;
+		std::deque<Bus> AllBuses;
 
 	};
+
+
 }
