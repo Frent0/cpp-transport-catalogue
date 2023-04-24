@@ -2,8 +2,14 @@
 
 namespace transport {
 
-    void TransportCatalogue::AddBus(const std::string& name, const std::vector<Stop*>& stops, bool is_circle) {
-        AllBuses.push_back(Bus(name, stops, is_circle));
+    void TransportCatalogue::AddBus(std::string_view name, std::vector<const Stop*>& stops, bool is_circle) {
+        std::vector<Stop*> FreeStops;
+
+        for (const Stop* stop : stops) {
+            FreeStops.push_back(SearchStopSetDistance(stop->NameStop));
+        }
+
+        AllBuses.push_back(Bus(name, FreeStops, is_circle));
         for (const auto& stop : stops) {
             if (StopNameToStop.count(stop->NameStop)) {
                 StopNameToStop.at(stop->NameStop)->NameBuses.insert(&AllBuses.back());
@@ -12,7 +18,7 @@ namespace transport {
         BusNameToBus[AllBuses.back().NameBus] = &AllBuses.back();
     }
 
-    void TransportCatalogue::AddStop(const std::string& name, const geo::Coordinates& coordinates) {
+    void TransportCatalogue::AddStop(std::string_view name, const geo::Coordinates& coordinates) {
         AllStops.push_back(Stop(name, coordinates));
         StopNameToStop[AllStops.back().NameStop] = &AllStops.back();
     }
@@ -33,11 +39,12 @@ namespace transport {
         return StopNameToStop.at(name)->NameBuses;
     }
 
-    void TransportCatalogue::SetDistanceBetweenStops(Stop* from, Stop* to, int distance) {
-        from->Distance[to] = distance;
+    void TransportCatalogue::SetDistanceBetweenStops(const Stop* from, const Stop* to, int distance) {
+        Stop* stop_from = SearchStopSetDistance(from->NameStop);
+        stop_from->Distance[to] = distance;
     }
 
-    int TransportCatalogue::GetDistanceBetweenStops(Stop* from, Stop* to) const {
+    int TransportCatalogue::GetDistanceBetweenStops(const Stop* from, const Stop* to) const {
         if (from->Distance.count(to)) return from->Distance.at(to);
         else if (to->Distance.count(from)) return to->Distance.at(from);
         else return 0;

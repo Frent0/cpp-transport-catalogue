@@ -17,9 +17,9 @@ namespace transport {
 	struct Stop;
 
 	struct Bus {
-		Bus(const std::string& name, const std::vector<Stop*>& stops, bool is_circle) :
-			NameBus(name), Stops(stops), CircularRoute(is_circle) {
 
+		Bus(std::string_view name, const std::vector<Stop*>& stops, bool is_circle) :
+			NameBus(name), Stops(stops), CircularRoute(is_circle) {
 		}
 
 		std::string NameBus;
@@ -38,14 +38,13 @@ namespace transport {
 
 	struct Stop {
 
-		Stop(const std::string& name, const geo::Coordinates& coordinates) :
+		Stop(std::string_view name, const geo::Coordinates& coordinates) :
 			NameStop(name), Coordinates(coordinates) {
-
 		}
 
 		std::string NameStop;
 		std::set < Bus*, Bus::cmp_ptr> NameBuses;
-		std::unordered_map<Stop*, int> Distance;
+		std::unordered_map<const Stop*, int> Distance;
 		geo::Coordinates Coordinates;
 	};
 
@@ -61,22 +60,22 @@ namespace transport {
 	class TransportCatalogue {
 	public:
 
-		void AddBus(const std::string& num, const std::vector<Stop*>& stops, bool is_circle);
-		void AddStop(const std::string& name, const geo::Coordinates& coordinates);
+		void AddBus(std::string_view num, std::vector<const Stop*>& stops, bool is_circle);
+		void AddStop(std::string_view name, const geo::Coordinates& coordinates);
 
 		const Bus* SearchRoute(std::string_view name) const;
 		const Stop* SearchStop(std::string_view name) const;
-
-		Stop* SearchStopSetDistance(std::string_view name) const;
 
 		const RouteInformation GetRouteInformation(std::string_view name) const;
 
 		const std::set<Bus*, Bus::cmp_ptr> GetStopRoutes(std::string_view name) const;
 
-		void SetDistanceBetweenStops(Stop* from, Stop* to, int distance);
-		int GetDistanceBetweenStops(Stop* from, Stop* to) const;
+		void SetDistanceBetweenStops(const Stop* from, const Stop* to, int distance);
+		int GetDistanceBetweenStops(const Stop* from, const Stop* to) const;
 
 	private:
+
+		Stop* SearchStopSetDistance(std::string_view name) const;
 
 		std::unordered_map<std::string_view, Bus*> BusNameToBus;
 		std::unordered_map<std::string_view, Stop*> StopNameToStop;

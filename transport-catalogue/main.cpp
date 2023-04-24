@@ -10,7 +10,7 @@ int main() {
     FillIinTheDatabase(catalogue);
 
     std::vector<std::string> result1{ "0TRtmwrQQe9IyZlDhs2kKnf", "0f6xSnxAsvMBtzIVIFseg9O16" , "2" ,  "ygIMsPew6Y", "62N"  , "6Kwr",  " " ,  " " ,  " " ,  " ", "" , "" ,  " " , " "  , " ",  " " ,  " " ,  " " ,  " " , "" ,  " ", " "  , " ",  " " ,  " " ,  " " ,  " " };
-
+    std::cout << "OKs" << std::endl;
     GetInformation(catalogue);
 
 

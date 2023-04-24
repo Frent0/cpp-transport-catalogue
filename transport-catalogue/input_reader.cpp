@@ -45,8 +45,8 @@ namespace transport {
 
 	namespace information {
 
-		std::tuple<std::string, const std::vector<Stop*>, bool> FillBus(std::string& line, TransportCatalogue& catalogue) {
-			std::vector<Stop*> stops_name;
+		std::tuple<std::string, std::vector<const Stop*>, bool> FillBus(std::string& line, TransportCatalogue& catalogue) {
+			std::vector<const Stop*> stops_name;
 
 			std::string name_bus = line.substr(1, line.find_first_of(':') - 1);
 			line.erase(0, line.find_first_of(':') + 2);
@@ -55,11 +55,11 @@ namespace transport {
 			bool circular = pos == '>';
 
 			while (line.find_first_of(pos) != line.npos) {
-				stops_name.push_back(catalogue.SearchStopSetDistance(line.substr(0, line.find_first_of(pos) - 1)));
+				stops_name.push_back(catalogue.SearchStop(line.substr(0, line.find_first_of(pos) - 1)));
 				line.erase(0, line.find_first_of(pos) + 2);
 			}
 
-			stops_name.push_back(catalogue.SearchStopSetDistance(line.substr(0, line.npos - 1)));
+			stops_name.push_back(catalogue.SearchStop(line.substr(0, line.npos - 1)));
 
 			return { name_bus,stops_name,circular };
 
@@ -91,7 +91,7 @@ namespace transport {
 			if (!line.empty()) {
 
 				std::string stop_from_name = FillStop(line).first;
-				Stop* from = catalogue.SearchStopSetDistance(stop_from_name);
+				const Stop* from = catalogue.SearchStop(stop_from_name);
 
 				while (!line.empty()) {
 					int distance = 0;
@@ -103,7 +103,7 @@ namespace transport {
 					if (line.find("m to ") == line.npos) {
 
 						stop_to_name = line.substr(0, line.npos - 1);
-						Stop* to = catalogue.SearchStopSetDistance(stop_to_name);
+						const Stop* to = catalogue.SearchStop(stop_to_name);
 
 						catalogue.SetDistanceBetweenStops(from, to, distance);
 
@@ -115,7 +115,7 @@ namespace transport {
 					}
 					else {
 						stop_to_name = line.substr(0, line.find_first_of(','));
-						Stop* to = catalogue.SearchStopSetDistance(stop_to_name);
+						const Stop* to = catalogue.SearchStop(stop_to_name);
 
 						catalogue.SetDistanceBetweenStops(from, to, distance);
 

@@ -12,7 +12,7 @@ namespace transport {
 
 		void FillStopDistances(std::string& line, TransportCatalogue& catalogue);
 
-		std::tuple<std::string, const std::vector<Stop*>, bool> FillBus(std::string& line, TransportCatalogue& catalogue);
+		std::tuple<std::string, std::vector<const Stop*>, bool> FillBus(std::string& line, TransportCatalogue& catalogue);
 		std::pair <std::string, geo::Coordinates> FillStop(std::string& line);
 	}
 }
