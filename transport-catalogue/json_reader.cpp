@@ -8,19 +8,19 @@ JsonReader::JsonReader(json::Document input_json)
 const json::Node& JsonReader::GetBaseRequest() const {
     if (input_json_.GetRoot().AsMap().count("base_requests"s))
         return input_json_.GetRoot().AsMap().at("base_requests"s);
-    else return dumm_;
+    else return null_;
 }
 
 const json::Node& JsonReader::GetStatRequest() const {
     if (input_json_.GetRoot().AsMap().count("stat_requests"s))
         return input_json_.GetRoot().AsMap().at("stat_requests"s);
-    else return dumm_;
+    else return null_;
 }
 
 const json::Node& JsonReader::GetRenderSettings() const {
     if (input_json_.GetRoot().AsMap().count("render_settings"s))
         return input_json_.GetRoot().AsMap().at("render_settings"s);
-    else return dumm_;
+    else return null_;
 }
 
 void JsonReader::FillCatalogue(transport::TransportCatalogue& catalogue) const {
