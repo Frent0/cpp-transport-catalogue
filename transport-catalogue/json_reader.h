@@ -21,7 +21,7 @@ public:
 
 private:
     json::Document input_json_;
-    json::Node dumm_{ nullptr };
+    json::Node null_{ nullptr };
 
     struct Gap_Bus_info {
         std::vector<std::string_view> stops;
