@@ -69,10 +69,7 @@ json::Node RequestHandler::FindBusRequest(const json::Dict& request_map) {
             straight_distance += geo::ComputeDistance(bus->Stops[i - 1]->Coordinates, bus->Stops[i]->Coordinates);
         }
         double curvature = distance / straight_distance;
-        unordered_set<string> unique_stops_set;
-        for (domain::Stop* s : bus->Stops) {
-            unique_stops_set.emplace(s->NameStop);
-        }
+        unordered_set<domain::Stop*> unique_stops_set{bus->Stops.begin(),bus->Stops.end()};
         int unique_stops = unique_stops_set.size();
         return json::Node(json::Dict{
                 {{"route_length"},{distance}},
