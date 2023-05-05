@@ -1,3 +1,4 @@
+
 #include "request_handler.h"
 
 #include <utility>
@@ -6,15 +7,15 @@
 
 using namespace std;
 
-RequestHandler::RequestHandler(const transport::TransportCatalogue& catalogue, const renderer ::MapRenderer& renderer)
+RequestHandler::RequestHandler(const transport::TransportCatalogue& catalogue, const renderer::MapRenderer& renderer)
     : catalogue_(catalogue)
-    , renderer_(renderer) {}
+    , renderer_(renderer) {
+}
 
 void RequestHandler::JsonStatRequests(const json::Node& json_input, ostream& output) {
     const json::Array& array = json_input.AsArray();
     json::Array output_array;
     output_array.reserve(array.size());
-
     for (auto& request_node : array) {
         const json::Dict& request_map = request_node.AsMap();
         const string& type = request_map.at("type"s).AsString();

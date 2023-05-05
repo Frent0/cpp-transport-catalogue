@@ -5,14 +5,13 @@
 
 int main() {
 
-    json::Document test = json::Load(std::cin);
+    json::Document document = json::Load(std::cin);
 
-    JsonReader input_json(test);
+    JsonReader input_json(document);
     transport::TransportCatalogue catalogue;
-    renderer::MapRenderer render(input_json.GetRenderSettings());
+    renderer::MapRenderer render(input_json.GetFillRenderer());
     RequestHandler out(catalogue,render);
-
-    const auto& values_ = test.GetRoot().AsMap();
+    const auto& values_ = document.GetRoot().AsMap();
     for (const auto& value_ : values_) {
         if (value_.first == "base_requests") {
             input_json.FillCatalogue(catalogue);
@@ -20,5 +19,6 @@ int main() {
         if (value_.first == "stat_requests") {
             out.JsonStatRequests(input_json.GetStatRequest(), std::cout);
         }
+        
     }
 }

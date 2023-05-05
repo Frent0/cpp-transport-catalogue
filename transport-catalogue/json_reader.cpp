@@ -23,6 +23,60 @@ const json::Node& JsonReader::GetRenderSettings() const {
     else return null_;
 }
 
+const renderer::RendererInfo JsonReader::GetFillRenderer() const {
+    json::Node render_settings = GetRenderSettings();
+    if (render_settings.IsNull()) return{};
+
+    renderer::RendererInfo result;
+    const json::Dict& settings_map = render_settings.AsMap();
+    result.width_ = settings_map.at("width").AsDouble();
+    result.height_ = settings_map.at("height").AsDouble();
+    result.padding_ = settings_map.at("padding").AsDouble();
+    result.stop_radius_ = settings_map.at("stop_radius").AsDouble();
+    result.line_width_ = settings_map.at("line_width").AsDouble();
+    result.bus_label_font_size_ = settings_map.at("bus_label_font_size").AsInt();
+    const json::Array& bus_label_offset = settings_map.at("bus_label_offset").AsArray();
+    result.bus_label_offset_ = { bus_label_offset[0].AsDouble(),
+                          bus_label_offset[1].AsDouble() };
+    result.stop_label_font_size_ = settings_map.at("stop_label_font_size").AsInt();
+    const json::Array& stop_label_offset = settings_map.at("stop_label_offset").AsArray();
+    result.stop_label_offset_ = { stop_label_offset[0].AsDouble(),
+                           stop_label_offset[1].AsDouble() };
+    if (settings_map.at("underlayer_color").IsArray()) {
+        const json::Array& arr = settings_map.at("underlayer_color").AsArray();
+        if (arr.size() == 3) {
+            svg::Rgb rgb_colors(arr[0].AsInt(), arr[1].AsInt(), arr[2].AsInt());
+            result.underlayer_color_ = rgb_colors;
+        }
+        else if (arr.size() == 4) {
+            svg::Rgba rgba_colors(arr[0].AsInt(), arr[1].AsInt(), arr[2].AsInt(), arr[3].AsDouble());
+            result.underlayer_color_ = rgba_colors;
+        }
+    }
+    else if (settings_map.at("underlayer_color").IsString()) {
+        result.underlayer_color_ = settings_map.at("underlayer_color").AsString();
+    }
+    result.underlayer_width_ = settings_map.at("underlayer_width").AsDouble();
+    const json::Array& color_palette = settings_map.at("color_palette").AsArray();
+    for (const json::Node& node : color_palette) {
+        if (node.IsArray()) {
+            const json::Array& arr = node.AsArray();
+            if (arr.size() == 3) {
+                svg::Rgb rgb_colors(arr[0].AsInt(), arr[1].AsInt(), arr[2].AsInt());
+                result.color_palette_.push_back(rgb_colors);
+            }
+            else if (arr.size() == 4) {
+                svg::Rgba rgba_colors(arr[0].AsInt(), arr[1].AsInt(), arr[2].AsInt(), arr[3].AsDouble());
+                result.color_palette_.push_back(rgba_colors);
+            }
+        }
+        else if (node.IsString()) {
+            result.color_palette_.push_back(node.AsString());
+        }
+    }
+    return result;
+}
+
 void JsonReader::FillCatalogue(transport::TransportCatalogue& catalogue) const {
     const json::Array& arr = GetBaseRequest().AsArray();
     StopsDistanceMap stop_to_stops_distance;

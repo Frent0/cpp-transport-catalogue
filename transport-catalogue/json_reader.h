@@ -1,8 +1,7 @@
 #pragma once
 
-#include "json.h"
+#include "map_renderer.h"
 #include "transport_catalogue.h"
-#include "domain.h"
 
 #include <unordered_map>
 #include <string>
@@ -18,6 +17,7 @@ public:
     const json::Node& GetRenderSettings() const;
 
     void FillCatalogue(transport::TransportCatalogue& catalogue) const;
+    const renderer::RendererInfo GetFillRenderer() const;
 
 private:
     json::Document input_json_;

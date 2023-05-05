@@ -16,11 +16,29 @@
 namespace renderer{
     class SphereProjector;
 
+    struct RendererInfo {
+
+        RendererInfo() = default;
+
+        double width_ = 0;
+        double height_ = 0;
+        double padding_ = 0;
+        double stop_radius_ = 0;
+        double line_width_ = 0;
+        int bus_label_font_size_ = 0;
+        svg::Point bus_label_offset_ = { 0.0, 0.0 };
+        svg::Point stop_label_offset_ = { 0.0, 0.0 };
+        int stop_label_font_size_ = 0;
+        svg::Color underlayer_color_;
+        double underlayer_width_ = 0;
+        std::vector<svg::Color> color_palette_ = {};
+    };
+
     class MapRenderer {
     public:
         MapRenderer() = default;
 
-        MapRenderer(const json::Node& render_settings);
+        MapRenderer(const renderer::RendererInfo& renderer);
 
         std::vector<svg::Polyline> GetBusLines(const std::map<std::string_view, domain::Bus*>& buses, const SphereProjector& sp) const;
 
@@ -35,18 +53,7 @@ namespace renderer{
 
 
     private:
-        double width_ = 0;
-        double height_ = 0;
-        double padding_ = 0;
-        double stop_radius_ = 0;
-        double line_width_ = 0;
-        int bus_label_font_size_ = 0;
-        svg::Point bus_label_offset_ = { 0.0, 0.0 };
-        svg::Point stop_label_offset_ = { 0.0, 0.0 };
-        int stop_label_font_size_ = 0;
-        svg::Color underlayer_color_;
-        double underlayer_width_ = 0;
-        std::vector<svg::Color> color_palette_ = {};
+        renderer::RendererInfo renderer_;
     };
 
     inline const double EPSILON = 1e-6;

@@ -6,8 +6,6 @@
 #include <vector>
 #include <variant>
 
-using namespace std::string_view_literals;
-
 namespace json {
 
     class Node;
@@ -24,13 +22,10 @@ namespace json {
         using Value = std::variant<std::nullptr_t, std::string, int, double, bool, Array, Dict>;
 
         Node() = default;
-        Node(std::nullptr_t);
-        Node(std::string value);
-        Node(int value);
-        Node(double value);
-        Node(bool value);
-        Node(Array array);
-        Node(Dict map);
+
+        template<typename T>
+        Node(T type):value_(std::move(type)) {
+        }
 
         bool IsInt() const;
         bool IsDouble() const;

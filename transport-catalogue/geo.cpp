@@ -17,4 +17,4 @@ double ComputeDistance(Coordinates from, Coordinates to) {
         * RadiusEarth;
     }
 
-}  // namespace geo
+}
