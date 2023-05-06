@@ -8,33 +8,36 @@
 #include <string_view>
 #include <vector>
 
-class JsonReader {
-public:
-    JsonReader(json::Document input_json);
+namespace transport {
 
-    const json::Node& GetBaseRequest() const;
-    const json::Node& GetStatRequest() const;
-    const json::Node& GetRenderSettings() const;
+    class JsonReader {
+    public:
+        JsonReader(json::Document input_json);
 
-    void FillCatalogue(transport::TransportCatalogue& catalogue) const;
-    const renderer::RendererInfo GetFillRenderer() const;
+        const json::Node& GetBaseRequest() const;
+        const json::Node& GetStatRequest() const;
+        const json::Node& GetRenderSettings() const;
 
-private:
-    json::Document input_json_;
-    json::Node null_{ nullptr };
+        void FillCatalogue(transport::TransportCatalogue& catalogue) const;
+        const renderer::RendererInfo GetFillRenderer() const;
 
-    struct Gap_Bus_info {
-        std::vector<std::string_view> stops;
-        std::string_view final_stop;
-        bool is_circle;
+    private:
+        json::Document input_json_;
+        json::Node null_{ nullptr };
+
+        struct Gap_Bus_info {
+            std::vector<std::string_view> Stops;
+            std::string_view FinalStop;
+            bool IsCircle;
+        };
+
+        using StopsDistanceMap = std::unordered_map<std::string_view, std::unordered_map<std::string_view, int>>;
+        using BusesInformationMap = std::unordered_map<std::string_view, Gap_Bus_info>;
+
+        void ParseStopAddRequest(transport::TransportCatalogue& catalogue, const json::Dict& request_map, StopsDistanceMap& stop_to_stops_distance) const;
+        void SetStopsDistances(transport::TransportCatalogue& catalogue, const StopsDistanceMap& stop_to_stops_distance) const;
+        void ParseBusAddRequest(const json::Dict& request_map, BusesInformationMap& buses_info) const;
+        void BusesAddProcess(transport::TransportCatalogue& catalogue, const BusesInformationMap& buses_info) const;
+        void SetFinals(transport::TransportCatalogue& catalogue, const BusesInformationMap& buses_info) const;
     };
-
-    using StopsDistanceMap = std::unordered_map<std::string_view, std::unordered_map<std::string_view, int>>;
-    using BusesInformationMap = std::unordered_map<std::string_view, Gap_Bus_info>;
-
-    void ParseStopAddRequest(transport::TransportCatalogue& catalogue, const json::Dict& request_map,StopsDistanceMap& stop_to_stops_distance) const;
-    void SetStopsDistances(transport::TransportCatalogue& catalogue,const StopsDistanceMap& stop_to_stops_distance) const;
-    void ParseBusAddRequest(const json::Dict& request_map, BusesInformationMap& buses_info) const;
-    void BusesAddProcess(transport::TransportCatalogue& catalogue, const BusesInformationMap& buses_info) const;
-    void SetFinals(transport::TransportCatalogue& catalogue, const BusesInformationMap& buses_info) const;
-};
+}

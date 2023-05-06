@@ -7,10 +7,11 @@ int main() {
 
     json::Document document = json::Load(std::cin);
 
-    JsonReader input_json(document);
+    transport::JsonReader input_json(document);
     transport::TransportCatalogue catalogue;
-    renderer::MapRenderer render(input_json.GetFillRenderer());
-    RequestHandler out(catalogue,render);
+    transport::renderer::MapRenderer render(input_json.GetFillRenderer());
+    transport::RequestHandler out(catalogue,render);
+
     const auto& values_ = document.GetRoot().AsMap();
     for (const auto& value_ : values_) {
         if (value_.first == "base_requests") {

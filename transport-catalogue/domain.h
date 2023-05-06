@@ -27,7 +27,7 @@ namespace domain {
 			}
 		};
 
-		Stop* final_stop = nullptr;
+		Stop* FinalStop = nullptr;
 	};
 
 	struct Stop {
