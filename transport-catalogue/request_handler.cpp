@@ -19,7 +19,7 @@ namespace transport {
         json::Array output_array;
         output_array.reserve(array.size());
         for (auto& request_node : array) {
-            const json::Dict& request_map = request_node.AsMap();
+            const json::Dict& request_map = request_node.AsDict();
             const string& type = request_map.at("type"s).AsString();
             if (type == "Stop"s) {
                 output_array.push_back(FindStopRequest(request_map));
@@ -53,11 +53,8 @@ namespace transport {
                     {{"request_id"},{id}}
                 });
         }
-        string error = "not found";
-        return json::Node(json::Dict{
-                    {{"request_id"},{id}},
-                    {{"error_message"},{std::move(error)}}
-            });
+        return json::Builder{}.Build();
+        
     }
 
     json::Node RequestHandler::FindBusRequest(const json::Dict& request_map) {

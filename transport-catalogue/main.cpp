@@ -12,7 +12,7 @@ int main() {
     transport::renderer::MapRenderer render(input_json.GetFillRenderer());
     transport::RequestHandler out(catalogue,render);
 
-    const auto& values_ = document.GetRoot().AsMap();
+    const auto& values_ = document.GetRoot().AsDict();
     for (const auto& value_ : values_) {
         if (value_.first == "base_requests") {
             input_json.FillCatalogue(catalogue);

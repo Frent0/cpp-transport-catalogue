@@ -8,20 +8,20 @@ namespace transport {
         : input_json_(input_json) {}
 
     const json::Node& JsonReader::GetBaseRequest() const {
-        if (input_json_.GetRoot().AsMap().count("base_requests"s))
-            return input_json_.GetRoot().AsMap().at("base_requests"s);
+        if (input_json_.GetRoot().AsDict().count("base_requests"s))
+            return input_json_.GetRoot().AsDict().at("base_requests"s);
         else return null_;
     }
 
     const json::Node& JsonReader::GetStatRequest() const {
-        if (input_json_.GetRoot().AsMap().count("stat_requests"s))
-            return input_json_.GetRoot().AsMap().at("stat_requests"s);
+        if (input_json_.GetRoot().AsDict().count("stat_requests"s))
+            return input_json_.GetRoot().AsDict().at("stat_requests"s);
         else return null_;
     }
 
     const json::Node& JsonReader::GetRenderSettings() const {
-        if (input_json_.GetRoot().AsMap().count("render_settings"s))
-            return input_json_.GetRoot().AsMap().at("render_settings"s);
+        if (input_json_.GetRoot().AsDict().count("render_settings"s))
+            return input_json_.GetRoot().AsDict().at("render_settings"s);
         else return null_;
     }
 
@@ -30,7 +30,7 @@ namespace transport {
         if (render_settings.IsNull()) return{};
 
         renderer::RendererInfo result;
-        const json::Dict& settings_map = render_settings.AsMap();
+        const json::Dict& settings_map = render_settings.AsDict();
         result.Width = settings_map.at("width").AsDouble();
         result.Height = settings_map.at("height").AsDouble();
         result.Padding = settings_map.at("padding").AsDouble();
@@ -84,7 +84,7 @@ namespace transport {
         StopsDistanceMap stop_to_stops_distance;
         BusesInformationMap buses_info;
         for (const auto& request_node : arr) {
-            const json::Dict& request_map = request_node.AsMap();
+            const json::Dict& request_map = request_node.AsDict();
             const string& type = request_map.at("type"s).AsString();
             if (type == "Stop"s) {
                 ParseStopAddRequest(catalogue, request_map, stop_to_stops_distance);
@@ -101,7 +101,7 @@ namespace transport {
     void JsonReader::ParseStopAddRequest(transport::TransportCatalogue& catalogue, const json::Dict& request_map, StopsDistanceMap& stop_to_stops_distance) const {
         const string& stop_name = request_map.at("name"s).AsString();
         catalogue.AddStop(stop_name, { request_map.at("latitude"s).AsDouble(),request_map.at("longitude"s).AsDouble() });
-        const json::Dict& near_stops = request_map.at("road_distances"s).AsMap();
+        const json::Dict& near_stops = request_map.at("road_distances"s).AsDict();
         for (const auto& [key_stop_name, dist_node] : near_stops) {
             stop_to_stops_distance[stop_name][key_stop_name] = dist_node.AsInt();
         }
