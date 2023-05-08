@@ -48,12 +48,15 @@ namespace transport {
             for (const auto& value : buses_on_stop) {
                 buses_array.push_back(value->NameBus);
             }
-            return json::Node(json::Dict{
-                    {{"buses"},{move(buses_array)}},
-                    {{"request_id"},{id}}
-                });
+            return json::Builder{}.StartDict()
+                .Key("buses"s).Value(buses_array)
+                .Key("request_id"s).Value(id)
+                .EndDict().Build();
         }
-        return json::Builder{}.Build();
+        return json::Builder{}.StartDict()
+            .Key("error_message"s).Value("not found"s)
+            .Key("request_id"s).Value(id)
+            .EndDict().Build();
         
     }
 
@@ -71,19 +74,18 @@ namespace transport {
             double curvature = distance / straight_distance;
             unordered_set<domain::Stop*> unique_stops_set{ bus->Stops.begin(),bus->Stops.end() };
             int unique_stops = unique_stops_set.size();
-            return json::Node(json::Dict{
-                    {{"route_length"},{distance}},
-                    {{"unique_stop_count"},{unique_stops}},
-                    {{"stop_count"},{stops_count}},
-                    {{"curvature"},{curvature}},
-                    {{"request_id"},{id}}
-                });
+            return json::Builder{}.StartDict()
+                .Key("route_length"s).Value(distance)
+                .Key("unique_stop_count"s).Value(unique_stops)
+                .Key("stop_count"s).Value(stops_count)
+                .Key("curvature"s).Value(curvature)
+                .Key("request_id").Value(id)
+                .EndDict().Build(); 
         }
-        string error = "not found";
-        return json::Node(json::Dict{
-                    {{"request_id"},{id}},
-                    {{"error_message"},std::move(error)}
-            });
+        return json::Builder{}.StartDict()
+            .Key("error_message"s).Value("not found"s)
+            .Key("request_id"s).Value(id)
+            .EndDict().Build();
     }
 
     json::Node RequestHandler::BuildMapRequest(const json::Dict& request_map) {
@@ -91,9 +93,9 @@ namespace transport {
         svg::Document map = renderer_.GetSvgDocument(catalogue_.GetBusNameToBus());
         ostringstream strm;
         map.Render(strm);
-        return json::Node(json::Dict{
-                    {{"map"s},{strm.str()}},
-                    {{"request_id"s},{id}}
-            });
+        return  json::Builder{}.StartDict()
+            .Key("map"s).Value(strm.str())
+            .Key("request_id"s).Value(id)
+            .EndDict().Build();
     }
 }

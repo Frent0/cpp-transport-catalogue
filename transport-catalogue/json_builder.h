@@ -14,12 +14,52 @@ namespace json {
         DICT
     };
 
-    class DictItemContext;
-    class DictValueContext;
-    class ArrayContext;
-
     class Builder {
     public:
+
+        class DictItemContext;
+        class DictValueContext;
+        class ArrayContext;
+
+        class DictItemContext {
+        public:
+            DictItemContext(Builder& builder)
+                : builder_(builder) {}
+
+            DictValueContext Key(const std::string& key);
+            Builder& EndDict();
+
+        private:
+            Builder& builder_;
+        };
+
+        class DictValueContext {
+        public:
+            DictValueContext(Builder& builder)
+                : builder_(builder) {}
+
+            DictItemContext Value(const Node::Value& val);
+            DictItemContext StartDict();
+            ArrayContext StartArray();
+
+        private:
+            Builder& builder_;
+        };
+
+        class ArrayContext {
+        public:
+            ArrayContext(Builder& builder)
+                : builder_(builder) {}
+
+            ArrayContext Value(const Node::Value& val);
+            DictItemContext StartDict();
+            ArrayContext StartArray();
+            Builder& EndArray();
+
+        private:
+            Builder& builder_;
+        };
+
         Builder() {
             step_stack_.push_back(Step::BUILD);
         }
@@ -41,45 +81,6 @@ namespace json {
         int arrays_open_ = 0;
         std::vector<std::vector<Node>> all_arrays_;
         std::vector< std::vector<std::pair<std::string, Node>> > all_dicts_;
-    };
-
-    class DictItemContext {
-    public:
-        DictItemContext(Builder& builder)
-            : builder_(builder) {}
-
-        DictValueContext Key(const std::string& key);
-        Builder& EndDict();
-
-    private:
-        Builder& builder_;
-    };
-
-    class DictValueContext {
-    public:
-        DictValueContext(Builder& builder)
-            : builder_(builder) {}
-
-        DictItemContext Value(const Node::Value& val);
-        DictItemContext StartDict();
-        ArrayContext StartArray();
-
-    private:
-        Builder& builder_;
-    };
-
-    class ArrayContext {
-    public:
-        ArrayContext(Builder& builder)
-            : builder_(builder) {}
-
-        ArrayContext Value(const Node::Value& val);
-        DictItemContext StartDict();
-        ArrayContext StartArray();
-        Builder& EndArray();
-
-    private:
-        Builder& builder_;
     };
 
 }
