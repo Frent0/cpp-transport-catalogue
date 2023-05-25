@@ -25,6 +25,12 @@ namespace transport {
         else return null_;
     }
 
+    const json::Node& JsonReader::GetRoutingSettings() const {
+        if (input_json_.GetRoot().AsDict().count("routing_settings"s))
+            return input_json_.GetRoot().AsDict().at("routing_settings"s);
+        else return null_;
+    }
+
     const renderer::RendererInfo JsonReader::GetFillRenderer() const {
         json::Node render_settings = GetRenderSettings();
         if (render_settings.IsNull()) return{};

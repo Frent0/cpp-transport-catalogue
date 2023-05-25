@@ -17,6 +17,7 @@ namespace transport {
         const json::Node& GetBaseRequest() const;
         const json::Node& GetStatRequest() const;
         const json::Node& GetRenderSettings() const;
+        const json::Node& GetRoutingSettings() const;
 
         void FillCatalogue(transport::TransportCatalogue& catalogue) const;
         const renderer::RendererInfo GetFillRenderer() const;

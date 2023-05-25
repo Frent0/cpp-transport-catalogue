@@ -9,9 +9,11 @@ using namespace std;
 
 namespace transport {
 
-    RequestHandler::RequestHandler(const TransportCatalogue& catalogue, const renderer::MapRenderer& renderer)
+    RequestHandler::RequestHandler(const transport::TransportCatalogue& catalogue,
+        const renderer::MapRenderer& renderer, const transport::Router& router)
         : catalogue_(catalogue)
-        , renderer_(renderer) {
+        , renderer_(renderer)
+        , router_(router){
     }
 
     void RequestHandler::JsonStatRequests(const json::Node& json_input, ostream& output) {
@@ -31,6 +33,10 @@ namespace transport {
             }
             if (type == "Map"s) {
                 output_array.push_back(BuildMapRequest(request_map));
+                continue;
+            }
+            if (type == "Route"s) {
+                output_array.push_back(BuildRouteRequest(request_map));
                 continue;
             }
         }
@@ -57,7 +63,7 @@ namespace transport {
             .Key("error_message"s).Value("not found"s)
             .Key("request_id"s).Value(id)
             .EndDict().Build();
-        
+
     }
 
     json::Node RequestHandler::FindBusRequest(const json::Dict& request_map) {
@@ -80,7 +86,7 @@ namespace transport {
                 .Key("stop_count"s).Value(stops_count)
                 .Key("curvature"s).Value(curvature)
                 .Key("request_id").Value(id)
-                .EndDict().Build(); 
+                .EndDict().Build();
         }
         return json::Builder{}.StartDict()
             .Key("error_message"s).Value("not found"s)
@@ -95,6 +101,29 @@ namespace transport {
         map.Render(strm);
         return  json::Builder{}.StartDict()
             .Key("map"s).Value(strm.str())
+            .Key("request_id"s).Value(id)
+            .EndDict().Build();
+    }
+
+    json::Node RequestHandler::BuildRouteRequest(const json::Dict& request_map) {
+        int id = request_map.at("id"s).AsInt();
+        const string& name_from = request_map.at("from"s).AsString();
+        const string& name_to = request_map.at("to"s).AsString();
+
+        if (const domain::Stop* stop_from = catalogue_.SearchStop(name_from)) {
+            if (const domain::Stop * stop_to = catalogue_.SearchStop(name_to)) {
+                if (auto info = router_.GetRouteInfo(stop_from, stop_to)) {
+                    auto [wieght, edges] = info.value();
+                    return json::Node(json::Dict{
+                        {{"items"s},{router_.GetEdgesItems(edges)}},
+                        {{"total_time"s},{wieght}},
+                        {{"request_id"s},{id}}
+                        });
+                }
+            }
+        }
+        return json::Builder{}.StartDict()
+            .Key("error_message"s).Value("not found"s)
             .Key("request_id"s).Value(id)
             .EndDict().Build();
     }

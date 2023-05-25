@@ -26,7 +26,7 @@ namespace json {
             DictItemContext(Builder& builder)
                 : builder_(builder) {}
 
-            DictValueContext Key(const std::string& key);
+            DictValueContext Key(std::string key);
             Builder& EndDict();
 
         private:
@@ -38,7 +38,7 @@ namespace json {
             DictValueContext(Builder& builder)
                 : builder_(builder) {}
 
-            DictItemContext Value(const Node::Value& val);
+            DictItemContext Value(Node::Value val);
             DictItemContext StartDict();
             ArrayContext StartArray();
 
@@ -51,7 +51,7 @@ namespace json {
             ArrayContext(Builder& builder)
                 : builder_(builder) {}
 
-            ArrayContext Value(const Node::Value& val);
+            ArrayContext Value(Node::Value val);
             DictItemContext StartDict();
             ArrayContext StartArray();
             Builder& EndArray();
@@ -68,12 +68,14 @@ namespace json {
         Builder& EndDict();
         ArrayContext StartArray();
         Builder& EndArray();
-        DictValueContext Key(const std::string& key);
-        Builder& Value(const Node::Value& val);
+        DictValueContext Key(std::string key);
+        Builder& Value(Node::Value val);
         Node Build() const;
-        void AddNode(Node&& node);
 
     private:
+
+        void AddNode(Node&& node);
+
         std::optional<Node> root_;
         std::vector<Step> step_stack_;
         std::vector< std::optional<std::string> > keys_;

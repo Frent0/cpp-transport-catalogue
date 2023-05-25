@@ -62,7 +62,7 @@ namespace json {
         return *this;
     }
 
-    Builder::DictValueContext Builder::Key(const std::string& key) {
+    Builder::DictValueContext Builder::Key(std::string key) {
         if (step_stack_.back() == Step::DICT) {
             if (dicts_open_ > 0) {
                 if (!keys_[dicts_open_ - 1]) {
@@ -76,7 +76,7 @@ namespace json {
         return *this;
     }
 
-    Builder& Builder::Value(const Node::Value& val) {
+    Builder& Builder::Value(Node::Value val) {
         if (step_stack_.empty()) throw std::logic_error("Must start with builder"s);
         if (root_) throw std::logic_error("Build finished"s);
 
@@ -117,7 +117,7 @@ namespace json {
         else throw std::logic_error("Must finish build"s);
     }
 
-    Builder::DictValueContext Builder::DictItemContext::Key(const std::string& key) {
+    Builder::DictValueContext Builder::DictItemContext::Key(std::string key) {
         return builder_.Key(key);
     }
 
@@ -125,7 +125,7 @@ namespace json {
         return builder_.EndDict();
     }
 
-    Builder::DictItemContext Builder::DictValueContext::Value(const Node::Value& val) {
+    Builder::DictItemContext Builder::DictValueContext::Value(Node::Value val) {
         return builder_.Value(val);
     }
 
@@ -137,7 +137,7 @@ namespace json {
         return builder_.StartArray();
     }
 
-    Builder::ArrayContext Builder::ArrayContext::Value(const Node::Value& val) {
+    Builder::ArrayContext Builder::ArrayContext::Value(Node::Value val) {
         return builder_.Value(val);
     }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "geo.h"
+#include "graph.h"
 
 #include <string>
 #include <unordered_map>
@@ -8,7 +9,9 @@
 #include <set>
 #include <string_view>
 
+
 namespace domain {
+
 	struct Stop;
 
 	struct Bus {
@@ -35,8 +38,9 @@ namespace domain {
 		Stop(std::string_view name, const geo::Coordinates& coordinates);
 
 		std::string NameStop;
-		std::set<Bus*,Bus::cmp_ptr> NameBuses;
+		std::set<Bus*, Bus::cmp_ptr> NameBuses;
 		std::unordered_map<const Stop*, int> Distance;
 		geo::Coordinates Coordinates;
 	};
+
 }
