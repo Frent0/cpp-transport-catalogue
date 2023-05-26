@@ -13,12 +13,14 @@ namespace transport {
 
     Router::Router(const json::Node& settings_node) {
         if (settings_node.IsNull()) return;
-        SetSettings(settings_node);
+        BusWaitTime = settings_node.AsDict().at("bus_wait_time"s).AsInt();
+        BusVelocity = settings_node.AsDict().at("bus_velocity"s).AsDouble();
     }
 
     Router::Router(const json::Node& settings_node, const TransportCatalogue& tcat) {
         if (settings_node.IsNull()) return;
-        SetSettings(settings_node);
+        BusWaitTime = settings_node.AsDict().at("bus_wait_time"s).AsInt();
+        BusVelocity = settings_node.AsDict().at("bus_velocity"s).AsDouble();
         BuildGraph(tcat);
     }
 
@@ -65,7 +67,7 @@ namespace transport {
             });
 
         Graph = move(stops_graph);
-        RouterPtr = new graph::Router<double>(Graph);
+        RouterPtr = std::make_unique<graph::Router<double>>(Graph);
         return Graph;
     }
 
@@ -95,12 +97,6 @@ namespace transport {
 
     std::optional<graph::Router<double>::RouteInfo> Router::GetRouteInfo(const domain::Stop* from, const domain::Stop* to) const {
         return RouterPtr->BuildRoute(StopIds.at(from->NameStop), StopIds.at(to->NameStop));
-    }
-
-
-    void Router::SetSettings(const json::Node& settings_node) {
-        BusWaitTime = settings_node.AsDict().at("bus_wait_time"s).AsInt();
-        BusVelocity = settings_node.AsDict().at("bus_velocity"s).AsDouble();
     }
 
 } 
