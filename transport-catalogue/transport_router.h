@@ -8,6 +8,7 @@
 
 #include <optional>
 #include <string>
+#include <memory>
 #include <string_view>
 
 namespace transport {
@@ -16,18 +17,14 @@ namespace transport {
     public:
         Router() = default;
 
-        Router(const json::Node& settings_node);
-        Router(const json::Node& settings_node, const TransportCatalogue& tcat);
+        explicit Router(const json::Node& settings_node);
+        explicit Router(const json::Node& settings_node, const TransportCatalogue& tcat);
 
         const graph::DirectedWeightedGraph<double>& BuildGraph(const TransportCatalogue& tcat);
 
         json::Array GetEdgesItems(const std::vector<graph::EdgeId>& edges) const;
 
         std::optional<graph::Router<double>::RouteInfo> GetRouteInfo(const domain::Stop* from, const domain::Stop* to) const;
-
-        ~Router() {
-            delete RouterPtr;
-        }
 
     private:
         int BusWaitTime = 0;
@@ -36,9 +33,8 @@ namespace transport {
         graph::DirectedWeightedGraph<double> Graph;
         std::map<std::string, graph::VertexId> StopIds;
 
-        graph::Router<double>* RouterPtr = nullptr;
+        std::unique_ptr<graph::Router<double>> RouterPtr = nullptr;
 
-        void SetSettings(const json::Node& settings_node);
     };
 
 } 
