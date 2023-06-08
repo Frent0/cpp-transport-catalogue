@@ -12,9 +12,6 @@
 #include <utility>
 #include <vector>
 
-
-
-
 namespace graph {
 
     template <typename Weight>

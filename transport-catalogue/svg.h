@@ -221,7 +221,7 @@ namespace svg {
 
     class Polyline final : public Object, public PathProps<Polyline> {
     public:
-        // Добавляет очередную вершину к ломаной линии
+        // Р”РѕР±Р°РІР»СЏРµС‚ РѕС‡РµСЂРµРґРЅСѓСЋ РІРµСЂС€РёРЅСѓ Рє Р»РѕРјР°РЅРѕР№ Р»РёРЅРёРё
         Polyline& AddPoint(Point point);
 
     private:
@@ -257,10 +257,10 @@ namespace svg {
     class Document : public ObjectContainer {
     public:
 
-        // Добавляет в svg-документ объект-наследник svg::Object
+        // Р”РѕР±Р°РІР»СЏРµС‚ РІ svg-РґРѕРєСѓРјРµРЅС‚ РѕР±СЉРµРєС‚-РЅР°СЃР»РµРґРЅРёРє svg::Object
         void AddPtr(std::unique_ptr<Object>&& obj);
 
-        // Выводит в ostream svg-представление документа
+        // Р’С‹РІРѕРґРёС‚ РІ ostream svg-РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ РґРѕРєСѓРјРµРЅС‚Р°
         void Render(std::ostream& out) const;
 
     private:

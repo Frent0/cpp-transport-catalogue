@@ -104,6 +104,20 @@ namespace transport {
         SetFinals(catalogue, buses_info);
     }
 
+    domain::GapRouterInfo JsonReader::GetRouterInfo() const {
+        domain::GapRouterInfo result;
+        const json::Node& arr = GetRoutingSettings();
+        if (arr == null_) {
+            result.IsNull = true;
+            return result;
+        }
+
+        result.BusWaitTime = arr.AsDict().at("bus_wait_time"s).AsInt();
+        result.BusVelocity = arr.AsDict().at("bus_velocity"s).AsDouble();
+
+        return result;
+    }
+
     void JsonReader::ParseStopAddRequest(transport::TransportCatalogue& catalogue, const json::Dict& request_map, StopsDistanceMap& stop_to_stops_distance) const {
         const string& stop_name = request_map.at("name"s).AsString();
         catalogue.AddStop(stop_name, { request_map.at("latitude"s).AsDouble(),request_map.at("longitude"s).AsDouble() });

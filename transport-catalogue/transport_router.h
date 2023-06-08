@@ -1,6 +1,5 @@
 #pragma once
 #include "domain.h"
-#include "json.h"
 #include "json_builder.h"
 #include "transport_catalogue.h"
 #include "graph.h"
@@ -15,10 +14,11 @@ namespace transport {
 
     class Router {
     public:
+
         Router() = default;
 
-        explicit Router(const json::Node& settings_node);
-        explicit Router(const json::Node& settings_node, const TransportCatalogue& tcat);
+        explicit Router(domain::GapRouterInfo settings_node);
+        explicit Router(domain::GapRouterInfo settings_node, const TransportCatalogue& tcat);
 
         const graph::DirectedWeightedGraph<double>& BuildGraph(const TransportCatalogue& tcat);
 
@@ -27,6 +27,7 @@ namespace transport {
         std::optional<graph::Router<double>::RouteInfo> GetRouteInfo(const domain::Stop* from, const domain::Stop* to) const;
 
     private:
+
         int BusWaitTime = 0;
         double BusVelocity = 0;
 
@@ -35,6 +36,9 @@ namespace transport {
 
         std::unique_ptr<graph::Router<double>> RouterPtr = nullptr;
 
+    private:
+
+        void SetSettings(domain::GapRouterInfo settings_node);
     };
 
 } 

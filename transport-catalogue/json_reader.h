@@ -20,6 +20,8 @@ namespace transport {
         const json::Node& GetRoutingSettings() const;
 
         void FillCatalogue(transport::TransportCatalogue& catalogue) const;
+        domain::GapRouterInfo GetRouterInfo() const;
+
         const renderer::RendererInfo GetFillRenderer() const;
 
     private:

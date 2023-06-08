@@ -17,7 +17,7 @@ int main() {
             input_json.FillCatalogue(catalogue);
         }
         if (value_.first == "stat_requests") {
-            transport::Router router(input_json.GetRoutingSettings(), catalogue);
+            transport::Router router(input_json.GetRouterInfo(), catalogue);
             transport::RequestHandler out(catalogue, render, router);
             out.JsonStatRequests(input_json.GetStatRequest(), std::cout);
         }
