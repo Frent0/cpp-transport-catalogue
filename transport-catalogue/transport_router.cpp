@@ -67,28 +67,36 @@ namespace transport {
         return Graph;
     }
 
-    json::Array Router::GetEdgesItems(const std::vector<graph::EdgeId>& edges) const {
-        json::Array items_array;
-        items_array.reserve(edges.size());
+    std::pair<std::vector<domain::BusItems>, std::vector<domain::StopItems>> Router::GetEdgesItems(const std::vector<graph::EdgeId>& edges) const {
+        std::vector<domain::BusItems> bus_items;
+        std::vector<domain::StopItems> stop_items;
+
+        bus_items.reserve(edges.size());
+        stop_items.reserve(edges.size());
+
         for (auto& edge_id : edges) {
             const graph::Edge<double>& edge = Graph.GetEdge(edge_id);
             if (edge.quality == 0) {
-                items_array.emplace_back(json::Node(json::Dict{
-                    {{"stop_name"s},{static_cast<string>(edge.name)}},
-                    {{"time"s},{edge.weight}},
-                    {{"type"s},{"Wait"s}}
-                    }));
+                domain::StopItems gap_stop;
+                gap_stop.stop_name = static_cast<string>(edge.name);
+                gap_stop.time = edge.weight;
+                gap_stop.type = "Wait";
+
+                stop_items.emplace_back(gap_stop);
             }
             else {
-                items_array.emplace_back(json::Node(json::Dict{
-                    {{"bus"s},{static_cast<string>(edge.name)}},
-                    {{"span_count"s},{static_cast<int>(edge.quality)}},
-                    {{"time"s},{edge.weight}},
-                    {{"type"s},{"Bus"s}}
-                    }));
+                domain::BusItems gap_bus;
+                gap_bus.bus = static_cast<string>(edge.name);
+                gap_bus.span_count = static_cast<int>(edge.quality);
+                gap_bus.time = edge.weight;
+                gap_bus.type = "Bus";
+                bus_items.emplace_back(gap_bus);
             }
         }
-        return items_array;
+        
+        std::cout << "\n\n\n\n\nSize:" << bus_items.size() + stop_items.size() << "\n\n\n\n\n" << std::endl;
+
+        return {bus_items,stop_items};
     }
 
 

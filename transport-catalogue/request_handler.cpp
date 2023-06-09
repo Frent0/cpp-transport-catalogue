@@ -114,8 +114,25 @@ namespace transport {
             if (const domain::Stop * stop_to = catalogue_.SearchStop(name_to)) {
                 if (auto info = router_.GetRouteInfo(stop_from, stop_to)) {
                     auto [wieght, edges] = info.value();
+                    std::pair<std::vector<domain::BusItems>, std::vector<domain::StopItems>> gap = router_.GetEdgesItems(edges);
+                    json::Array value;
+                    for (domain::BusItems gap_ : gap.first) {
+                        value.emplace_back(json::Node(json::Dict{
+                            {{"bus"s},{gap_.bus}},
+                            {{"span_count"s},{gap_.span_count}},
+                            {{"time"s},{gap_.time}},
+                            {{"type"s},{gap_.type}}
+                            }));
+                    }
+                    for (domain::StopItems gap_ : gap.second) {
+                        value.emplace_back(json::Node(json::Dict{
+                            {{"stop_name"s},{gap_.stop_name}},
+                            {{"time"s},{gap_.time}},
+                            {{"type"s},{gap_.type}}
+                            }));
+                    }
                     return json::Node(json::Dict{
-                        {{"items"s},{router_.GetEdgesItems(edges)}},
+                        {{"items"s},{value}},
                         {{"total_time"s},{wieght}},
                         {{"request_id"s},{id}}
                         });

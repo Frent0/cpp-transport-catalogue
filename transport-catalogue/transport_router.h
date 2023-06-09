@@ -22,7 +22,7 @@ namespace transport {
 
         const graph::DirectedWeightedGraph<double>& BuildGraph(const TransportCatalogue& tcat);
 
-        json::Array GetEdgesItems(const std::vector<graph::EdgeId>& edges) const;
+        std::pair<std::vector<domain::BusItems>, std::vector<domain::StopItems>> GetEdgesItems(const std::vector<graph::EdgeId>& edges) const;
 
         std::optional<graph::Router<double>::RouteInfo> GetRouteInfo(const domain::Stop* from, const domain::Stop* to) const;
 
