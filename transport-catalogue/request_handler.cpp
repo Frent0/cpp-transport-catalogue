@@ -114,21 +114,21 @@ namespace transport {
             if (const domain::Stop * stop_to = catalogue_.SearchStop(name_to)) {
                 if (auto info = router_.GetRouteInfo(stop_from, stop_to)) {
                     auto [wieght, edges] = info.value();
-                    std::pair<std::vector<domain::BusItems>, std::vector<domain::StopItems>> gap = router_.GetEdgesItems(edges);
+                    std::pair<std::vector<domain::BusItems>, std::vector<domain::StopItems>> gap_result = router_.GetEdgesItems(edges);
                     json::Array value;
-                    for (domain::BusItems gap_ : gap.first) {
+                    for (domain::BusItems type_bus : gap_result.first) {
                         value.emplace_back(json::Node(json::Dict{
-                            {{"bus"s},{gap_.bus}},
-                            {{"span_count"s},{gap_.span_count}},
-                            {{"time"s},{gap_.time}},
-                            {{"type"s},{gap_.type}}
+                            {{"bus"s},{type_bus.bus}},
+                            {{"span_count"s},{type_bus.span_count}},
+                            {{"time"s},{type_bus.time}},
+                            {{"type"s},{type_bus.type}}
                             }));
                     }
-                    for (domain::StopItems gap_ : gap.second) {
+                    for (domain::StopItems type_stop : gap_result.second) {
                         value.emplace_back(json::Node(json::Dict{
-                            {{"stop_name"s},{gap_.stop_name}},
-                            {{"time"s},{gap_.time}},
-                            {{"type"s},{gap_.type}}
+                            {{"stop_name"s},{type_stop.stop_name}},
+                            {{"time"s},{type_stop.time}},
+                            {{"type"s},{type_stop.type}}
                             }));
                     }
                     return json::Node(json::Dict{

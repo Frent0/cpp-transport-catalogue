@@ -77,25 +77,16 @@ namespace transport {
         for (auto& edge_id : edges) {
             const graph::Edge<double>& edge = Graph.GetEdge(edge_id);
             if (edge.quality == 0) {
-                domain::StopItems gap_stop;
-                gap_stop.stop_name = static_cast<string>(edge.name);
-                gap_stop.time = edge.weight;
-                gap_stop.type = "Wait";
-
-                stop_items.emplace_back(gap_stop);
+                stop_items.emplace_back(
+                    domain::StopItems{static_cast<string>(edge.name), edge.weight, "Wait"}
+                );
             }
             else {
-                domain::BusItems gap_bus;
-                gap_bus.bus = static_cast<string>(edge.name);
-                gap_bus.span_count = static_cast<int>(edge.quality);
-                gap_bus.time = edge.weight;
-                gap_bus.type = "Bus";
-                bus_items.emplace_back(gap_bus);
+                bus_items.emplace_back(
+                    domain::BusItems{static_cast<string>(edge.name), static_cast<int>(edge.quality), edge.weight, "Bus"}
+                );
             }
         }
-        
-        std::cout << "\n\n\n\n\nSize:" << bus_items.size() + stop_items.size() << "\n\n\n\n\n" << std::endl;
-
         return {bus_items,stop_items};
     }
 
