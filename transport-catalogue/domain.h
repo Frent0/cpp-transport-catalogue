@@ -49,17 +49,4 @@ namespace domain {
 		bool IsNull = false;
 	};
 
-	struct BusItems {
-		std::string bus;
-		int span_count;
-		double time;
-		std::string type;
-	};
-
-	struct StopItems {
-		std::string stop_name;
-		double time;
-		std::string type;
-	};
-
 }

@@ -67,27 +67,24 @@ namespace transport {
         return Graph;
     }
 
-    std::pair<std::vector<domain::BusItems>, std::vector<domain::StopItems>> Router::GetEdgesItems(const std::vector<graph::EdgeId>& edges) const {
-        std::vector<domain::BusItems> bus_items;
-        std::vector<domain::StopItems> stop_items;
-
-        bus_items.reserve(edges.size());
-        stop_items.reserve(edges.size());
+    std::vector<std::variant<transport::Router::StopItems, transport::Router::BusItems>> Router::GetEdgesItems(const std::vector<graph::EdgeId>& edges) const {
+        std::vector<std::variant<StopItems, BusItems>> result;
+        result.reserve(edges.size());
 
         for (auto& edge_id : edges) {
             const graph::Edge<double>& edge = Graph.GetEdge(edge_id);
             if (edge.quality == 0) {
-                stop_items.emplace_back(
-                    domain::StopItems{static_cast<string>(edge.name), edge.weight, "Wait"}
+                result.emplace_back(
+                   StopItems{static_cast<string>(edge.name), edge.weight}
                 );
             }
             else {
-                bus_items.emplace_back(
-                    domain::BusItems{static_cast<string>(edge.name), static_cast<int>(edge.quality), edge.weight, "Bus"}
+                result.emplace_back(
+                    BusItems{static_cast<string>(edge.name), static_cast<int>(edge.quality), edge.weight}
                 );
             }
         }
-        return {bus_items,stop_items};
+        return result;
     }
 
 

@@ -114,22 +114,25 @@ namespace transport {
             if (const domain::Stop * stop_to = catalogue_.SearchStop(name_to)) {
                 if (auto info = router_.GetRouteInfo(stop_from, stop_to)) {
                     auto [wieght, edges] = info.value();
-                    std::pair<std::vector<domain::BusItems>, std::vector<domain::StopItems>> gap_result = router_.GetEdgesItems(edges);
+                    std::vector<std::variant<transport::Router::StopItems, transport::Router::BusItems>> gap_result = router_.GetEdgesItems(edges);
                     json::Array value;
-                    for (domain::BusItems type_bus : gap_result.first) {
-                        value.emplace_back(json::Node(json::Dict{
-                            {{"bus"s},{type_bus.bus}},
-                            {{"span_count"s},{type_bus.span_count}},
-                            {{"time"s},{type_bus.time}},
-                            {{"type"s},{type_bus.type}}
-                            }));
-                    }
-                    for (domain::StopItems type_stop : gap_result.second) {
-                        value.emplace_back(json::Node(json::Dict{
-                            {{"stop_name"s},{type_stop.stop_name}},
-                            {{"time"s},{type_stop.time}},
-                            {{"type"s},{type_stop.type}}
-                            }));
+
+                    for (std::variant<transport::Router::StopItems, transport::Router::BusItems> type : gap_result) {
+                        if (std::holds_alternative<transport::Router::StopItems>(type)) {
+                            value.emplace_back(json::Node(json::Dict{
+                                {{"stop_name"s},{std::get<transport::Router::StopItems>(type).stop_name}},
+                                {{"time"s},{std::get<transport::Router::StopItems>(type).time}},
+                                {{"type"s},{"Wait"}}
+                                }));
+                        }
+                        else {
+                            value.emplace_back(json::Node(json::Dict{
+                                {{"bus"s},{std::get<transport::Router::BusItems>(type).bus}},
+                                {{"span_count"s},{std::get<transport::Router::BusItems>(type).span_count}},
+                                {{"time"s},{std::get<transport::Router::BusItems>(type).time}},
+                                {{"type"s},{"Bus"}}
+                                }));
+                        }
                     }
                     return json::Node(json::Dict{
                         {{"items"s},{value}},

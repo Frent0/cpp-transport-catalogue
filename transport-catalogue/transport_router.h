@@ -15,6 +15,17 @@ namespace transport {
     class Router {
     public:
 
+        struct BusItems {
+            std::string bus;
+            int span_count;
+            double time;
+        };
+
+        struct StopItems {
+            std::string stop_name;
+            double time;
+        };
+
         Router() = default;
 
         explicit Router(domain::GapRouterInfo settings_node);
@@ -22,7 +33,7 @@ namespace transport {
 
         const graph::DirectedWeightedGraph<double>& BuildGraph(const TransportCatalogue& tcat);
 
-        std::pair<std::vector<domain::BusItems>, std::vector<domain::StopItems>> GetEdgesItems(const std::vector<graph::EdgeId>& edges) const;
+        std::vector<std::variant<StopItems,BusItems>> GetEdgesItems(const std::vector<graph::EdgeId>& edges) const;
 
         std::optional<graph::Router<double>::RouteInfo> GetRouteInfo(const domain::Stop* from, const domain::Stop* to) const;
 
