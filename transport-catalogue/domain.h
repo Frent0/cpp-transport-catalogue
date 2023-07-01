@@ -1,52 +1,85 @@
 #pragma once
-
+ 
+#include <algorithm>
+#include <vector>
+#include <string>
+#include <variant>
+ 
 #include "geo.h"
 #include "graph.h"
-
-#include <string>
-#include <unordered_map>
-#include <vector>
-#include <set>
-#include <string_view>
-
-
+ 
 namespace domain {
-
-	struct Stop;
-
-	struct Bus {
-
-		Bus(std::string_view name, const std::vector<Stop*>& stops, bool is_circle);
-
-		std::string NameBus;
-		std::vector<Stop*> Stops;
-		bool CircularRoute;
-
-		struct cmp_ptr
-		{
-			bool operator()(const Bus* lhs, const Bus* rhs) const
-			{
-				return lhs->NameBus < rhs->NameBus;
-			}
-		};
-
-		Stop* FinalStop = nullptr;
-	};
-
-	struct Stop {
-
-		Stop(std::string_view name, const geo::Coordinates& coordinates);
-
-		std::string NameStop;
-		std::set<Bus*, Bus::cmp_ptr> NameBuses;
-		std::unordered_map<const Stop*, int> Distance;
-		geo::Coordinates Coordinates;
-	};
-
-	struct GapRouterInfo {
-		int BusWaitTime;
-		double BusVelocity; 
-		bool IsNull = false;
-	};
-
+ 
+struct StatRequest { 
+    int id;
+    std::string type;
+    std::string name;    
+    std::string from;
+    std::string to;
+};
+    
+struct Bus;
+    
+struct Stop {     
+    std::string name;
+    double latitude;
+    double longitude;
+    
+    std::vector<Bus*> buses;
+};
+ 
+struct Bus {     
+    std::string name;
+    std::vector<Stop*> stops;
+    bool is_roundtrip;
+    size_t route_length;
+};
+ 
+struct Distance {    
+    const Stop* start;
+    const Stop* end;
+    int distance;
+};  
+ 
+struct BusQueryResult {
+    std::string_view name;
+    bool not_found;
+    int stops_on_route;
+    int unique_stops;
+    int route_length;
+    double curvature;
+};    
+   
+struct StopQueryResult {
+    std::string_view name;
+    bool not_found;
+    std::vector<std::string> buses_name;
+};
+    
+struct StopEdge {
+    std::string_view name;
+    double time = 0;
+};
+ 
+struct BusEdge {
+    std::string_view bus_name;
+    size_t span_count = 0;
+    double time = 0;
+};
+ 
+struct RoutingSettings {
+    double bus_wait_time = 0;
+    double bus_velocity = 0;
+};
+ 
+struct RouterByStop {
+    graph::VertexId bus_wait_start;
+    graph::VertexId bus_wait_end;
+};
+ 
+struct RouteInfo {
+    double total_time = 0.;
+    std::vector<std::variant<StopEdge, BusEdge>> edges;
+};
+ 
 }
