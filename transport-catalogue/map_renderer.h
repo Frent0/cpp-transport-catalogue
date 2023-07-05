@@ -85,11 +85,8 @@ private:
 };
  
 template <typename InputIt>
-    SphereProjector::SphereProjector(InputIt points_begin, 
-                                     InputIt points_end,
-                                     double max_width, 
-                                     double max_height, 
-                                     double padding) : padding_(padding) {
+    SphereProjector::SphereProjector(InputIt points_begin, InputIt points_end,double max_width,
+    double max_height, double padding) : padding_(padding) {
         if (points_begin == points_end) {
             return;
         }
